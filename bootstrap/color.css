@@ -1,0 +1,9 @@
+.dark-blue{
+    background-color: #041B2D;
+}
+.light-blue{
+    background-color: #0999E0;
+}
+.light-blue:hover{
+    color: white;
+}

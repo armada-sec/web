@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap/color.css">
+</head>
+
+<body class="dark-blue">
+    <nav class="navbar navbar-expand-lg dark-blue p-0 border-bottom border-white">
+        <div class="container-fluid">
+            <a class="navbar-brand m-0" href="menu.html">
+                <img src="assets/logo_armada_icon.png" alt="Bootstrap" height="100">
+            </a>
+            <button class="navbar-toggler border border-white text-white" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <svg xmlns="http://www.w3.org/2000/svg" height="32" fill="currentColor" class="bi bi-list"
+                    viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                        d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
+                </svg>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="fs-4 text-white ms-4 text-decoration-none" href="alert.html">Alertas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="fs-4 text-white ms-4 text-decoration-none" href="#">Link</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="fs-4 text-white ms-4 text-decoration-none" href="#">Link</a>
+                    </li>
+                </ul>
+                <div class="d-flex me-2">
+                    <a class="btn light-blue fw-medium fs-5" href="registro.html">Registrar ocorrência</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <h1 class="text-center my-3 text-white">Ocorrências</h1>
+    <div class="container">
+        <div class="row row-cols-1 row-cols-md-3 g-4" id="cardDiv">
+        </div>
+    </div>
+
+    <script src="bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="scripts.js"></script>
+    <script>
+        const cardDiv = document.getElementById("cardDiv");
+
+        fetch(hostname + "/occurrences")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na solicitação: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                for (obj in data) {
+                    const datetime = dateTimeFormat(data[obj].createdAt).split(" ")
+
+                    const date = datetime[0]
+                    const time = datetime[1]
+
+                    var occurrenceType = data[obj].occurrenceType
+
+                    const title = data[obj].title
+                    const description = data[obj].description
+
+                    console.log(data)
+
+                    fetch(hostname + "/occurrences/types/" + occurrenceType)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Erro na solicitação: ' + response.status);
+                            }
+                            return response.json();
+                        })
+                        .then(dataType => {
+                            occurrenceType = dataType.name
+
+                            const htmlText = `<div class="col">
+                                            <div class="card border border-white dark-blue h-100">
+                                                <div class="card-body">
+                                                    <h5 class="card-title text-white">${title}</h5>
+                                                    <p class="card-text text-white">${description}</p>
+                                                    <p class="card-text text-white">Tipo: ${occurrenceType}<br>Data: ${date}<br>Hora: ${time}</p>
+                                                </div>
+                                            </div>
+                                        </div>`
+
+                            cardDiv.innerHTML += htmlText
+                        })
+                        .catch(error => {
+                            console.error('Erro: ' + error);
+                        });
+                }
+            })
+            .catch(error => {
+                console.error('Erro: ' + error);
+            });
+
+
+    </script>
+</body>
+
+</html>
