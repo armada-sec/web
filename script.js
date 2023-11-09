@@ -1,0 +1,40 @@
+hostname = "https://e-armada.onrender.com"
+
+function dateTimeFormat(dateTimeString) {
+  const datetime = new Date(dateTimeString);
+
+  let day = Number(String(datetime.getDate()).padStart(2, '0'));
+  let month = Number(String(datetime.getMonth() + 1).padStart(2, '0'));
+  let year = datetime.getFullYear();
+
+  let hour = Number(String(datetime.getHours() - 3).padStart(2, '0'));
+
+  if (hour < 0) {
+    hour = 24 + hour
+    day--;
+
+    if (day == 0) {
+      month--;
+
+      if (month == 0) {
+        year--;
+      }
+    }
+  }
+
+  day = String(day).padStart(2, '0');
+  month = String(month).padStart(2, '0');
+
+  hour = String(hour).padStart(2, '0');
+
+  const minutes = String(datetime.getMinutes()).padStart(2, '0');
+  const seconds = String(datetime.getSeconds()).padStart(2, '0');
+
+  return `${day}/${month}/${year} ${hour}:${minutes}:${seconds}`;
+}
+
+function verifyOccurrence() {
+
+}
+
+setInterval(verifyOccurrence, 1000)

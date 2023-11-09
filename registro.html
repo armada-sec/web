@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar ocorrência - Armada</title>
+    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap/color.css">
+</head>
+
+<body class="dark-blue">
+    <nav class="navbar navbar-expand-lg dark-blue p-0 border-bottom border-white">
+        <div class="container-fluid">
+            <a class="navbar-brand m-0" href="menu.html">
+                <img src="assets/logo_armada_icon.png" alt="Bootstrap" height="100">
+            </a>
+            <button class="navbar-toggler border border-white text-white" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <svg xmlns="http://www.w3.org/2000/svg" height="32" fill="currentColor" class="bi bi-list"
+                    viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                        d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
+                </svg>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="fs-4 text-white ms-4 text-decoration-none" href="menu.html">Ocorrências</a>
+                    </li>
+                </ul>
+                <div class="d-flex me-2">
+                    <a class="btn light-blue fw-medium fs-5" href="registro.html">Registrar ocorrência</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container my-5 w-50 border border-white rounded">
+        <h1 class="text-center my-3 text-white">Registrar ocorrência</h1>
+        <form class="my-4" id="occurrenceForm">
+            <div class="mb-3">
+                <label for="title" class="form-label text-white">Título</label>
+                <input type="text" class="form-control" id="title">
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label text-white">Descrição</label>
+                <input type="text" class="form-control" id="description">
+            </div>
+            <div class="mb-3">
+                <label for="street" class="form-label text-white">Rua e número</label>
+                <input type="text" class="form-control" id="street">
+            </div>
+            <div class="mb-3">
+                <label for="neighborhood" class="form-label text-white">Bairro</label>
+                <input type="text" class="form-control" id="neighborhood">
+            </div>
+            <div class="mb-3">
+                <label for="city" class="form-label text-white">Cidade</label>
+                <input type="text" class="form-control" id="city">
+            </div>
+            <div class="mb-3">
+                <label for="state" class="form-label text-white">Estado</label>
+                <input type="text" class="form-control" id="state">
+            </div>
+            <div class="mb-3">
+                <label for="type" class="text-white">Escolha o tipo de ocorrência:</label>
+                <select id="type" name="type" class="form-select">
+                    <option selected>Selecione uma opção</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Enviar</button>
+        </form>
+    </div>
+    <script src="bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        const occurrenceTypeSelect = document.getElementById("type");
+
+        fetch(hostname + "/occurrences/types")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na solicitação: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                for (obj in data) {
+                    const htmlText = `<option value="${data[obj].id}">${data[obj].name}</option>`
+
+                    occurrenceTypeSelect.innerHTML += htmlText
+                }
+            })
+            .catch(error => {
+                console.error('Erro: ' + error);
+            });
+
+        document.getElementById('occurrenceForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            let data = {}
+
+            data["title"] = document.getElementById('title').value;
+            data["description"] = document.getElementById('description').value;
+
+            const streetAndNumber = document.getElementById('street').value.split(", ");
+
+            data["street"] = streetAndNumber[0];
+            data["number"] = Number(streetAndNumber[1]);
+
+            data["city"] = document.getElementById('city').value;
+            data["state"] = document.getElementById('state').value;
+            data["occurrenceType"] = document.getElementById('type').value;
+
+            fetch(hostname + "/occurrences/create", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao enviar os dados para a API');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    window.location.href = "menu.html";
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                });
+
+
+        });
+
+    </script>
+</body>
+
+</html>
