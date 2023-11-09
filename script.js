@@ -34,7 +34,33 @@ function dateTimeFormat(dateTimeString) {
 }
 
 function verifyOccurrence() {
-
+  fetch(hostname + "/users/0ba42d6f-5bd0-4c5b-880d-d16cbbc425d1")
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erro na solicitação: ' + response.status);
+      }
+      return response.json();
+    })
+    .then(user => {
+      fetch(hostname + "/occurrences/last")
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erro na solicitação: ' + response.status);
+          }
+          return response.json();
+        })
+        .then(occurrence => {
+          if (user.street == occurrence.street || user.neighborhood == occurrence.neighborhood) {
+            window.location.href = "alert.html"
+          }
+        })
+        .catch(error => {
+          console.error('Erro: ' + error);
+        });
+    })
+    .catch(error => {
+      console.error('Erro: ' + error);
+    });
 }
 
 setInterval(verifyOccurrence, 1000)

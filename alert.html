@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atenção!</title>
+    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap/color.css">
+</head>
+
+<body class="dark-blue">
+    <a href="menu.html" class="btn btn-light">Voltar</a>
+    <div class="mx-auto w-50 text-center border border-white rounded text-white mt-5" id="alert">
+        <svg xmlns="http://www.w3.org/2000/svg" height="200" fill="currentColor"
+            class="bi bi-exclamation-diamond m-3 text-danger" viewBox="0 0 16 16">
+            <path
+                d="M6.95.435c.58-.58 1.52-.58 2.1 0l6.515 6.516c.58.58.58 1.519 0 2.098L9.05 15.565c-.58.58-1.519.58-2.098 0L.435 9.05a1.482 1.482 0 0 1 0-2.098L6.95.435zm1.4.7a.495.495 0 0 0-.7 0L1.134 7.65a.495.495 0 0 0 0 .7l6.516 6.516a.495.495 0 0 0 .7 0l6.516-6.516a.495.495 0 0 0 0-.7L8.35 1.134z" />
+            <path
+                d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z" />
+        </svg>
+        <p class="fs-3 text-danger">Ocorrência Registrada próxima a você!</p>
+    </div>
+    <script src="bootstrap/bootstrap.bundle.min.js"></script>
+    <script>
+        const alert = document.getElementById("alert")
+
+        fetch("https://e-armada.onrender.com/occurrences/last")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na solicitação: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                var occurrenceType = data.occurrenceType
+
+                const title = data.title
+                const description = data.description
+
+                fetch("https://e-armada.onrender.com/occurrences/types/" + occurrenceType)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro na solicitação: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(dataType => {
+                        occurrenceType = dataType.name
+
+                        const htmlText = `<p class="fw-bold">Tipo: ${occurrenceType}.</p>
+                        <p class="fw-bold">Local: ${data.street}, N°${data.number}, ${data.neighborhood}.</p>`
+
+                        alert.innerHTML += htmlText
+                    })
+                    .catch(error => {
+                        console.error('Erro: ' + error);
+                    });
+
+            })
+            .catch(error => {
+                console.error('Erro: ' + error);
+            });
+
+        const audio = new Audio('Alarm sound effect(MP3_320K).mp3');
+
+        audio.play();
+    </script>
+</body>
+
+</html>
